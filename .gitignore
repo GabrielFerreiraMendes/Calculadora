@@ -1,0 +1,50 @@
+# Delphi IDE e arquivos temporários
+__history/
+__recovery/
+*.identcache
+*.local
+*.stat
+*.tvsconfig
+*.dsk
+
+# Arquivos compilados (.dcu)
+*.dcu
+
+# Binários e executáveis
+*.exe
+*.dll
+*.bpl
+*.bpi
+*.dcp
+*.so
+*.apk
+*.drc
+*.map
+*.jdbg
+
+# Diretórios de build (Debug/Release) gerados pelo Delphi
+Win32/
+Win64/
+OSX32/
+OSX64/
+Android/
+Android64/
+iOSDevice32/
+iOSDevice64/
+iOSSimulator/
+Linux64/
+
+# Arquivos de log e configurações de usuário específicas
+*.log
+*.dproj.local
+*.groupproj.local
+
+# ModelSupport (Arquivos UML do Delphi, caso não utilize)
+ModelSupport_*/
+
+# Arquivos de TestInsight (caso aplicável futuramente)
+*.ti
+
+# Arquivos temporários do OS
+.DS_Store
+Thumbs.db
