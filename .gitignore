@@ -48,3 +48,8 @@ ModelSupport_*/
 # Arquivos temporários do OS
 .DS_Store
 Thumbs.db
+
+# Arquivos de Tagging/Navegação (GNU Global)
+GPATH
+GRTAGS
+GTAGS
