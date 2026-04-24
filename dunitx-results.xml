@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<test-results name="C:\Users\Gabriel\OneDrive\Documentos\Calculadora\CalculadoraTests.exe" total="25" errors="0" failures="0" ignored="0" inconclusive="0" not-run="0" skipped="0" invalid="0" date="2026-04-24" time="3.356">
+  <culture-info current-culture="en" current-uiculture="en" />
+  <test-suite type="Assembly" name="CalculadoraTests.exe" executed="true" result="Success" success="True" time="3.356" asserts="0">
+    <results>
+        <test-suite type="Namespace" name="Test" executed="true" result="Success" success="True" time="3.356" asserts="0" >
+          <results>
+              <test-suite type="Namespace" name="Calculator" executed="true" result="Success" success="True" time="3.356" asserts="0" >
+                <results>
+                    <test-suite type="Fixture" name="TTestCalculatorEngine" executed="True" result="Success" success="True" time="2.721" >
+                      <results>
+                        <test-case name="TestCalculateWithoutStrategyRaisesException" executed="True" result="Success" success="True" time="2.723" asserts="0" />
+                        <test-case name="TestCalculateWithStrategyDelegatesExecution" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                        <test-case name="TestGetActiveOperationName" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                      </results>
+                    </test-suite>
+                    <test-suite type="Fixture" name="TTestOperationFactory" executed="True" result="Success" success="True" time="0.000" >
+                      <results>
+                        <test-case name="TestRegisterOperationIncrementsCount" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                        <test-case name="TestGetOperationsReturnsArray" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                      </results>
+                    </test-suite>
+                    <test-suite type="Namespace" name="Operation" executed="true" result="Success" success="True" time="0.634" asserts="0" >
+                      <results>
+                          <test-suite type="Fixture" name="TTestAdditionOperation" executed="True" result="Success" success="True" time="0.000" >
+                            <results>
+                              <test-case name="TestExecute.Positive Numbers" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Negative Numbers" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Positive and Negative" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Decimals" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestOperationName" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                            </results>
+                          </test-suite>
+                          <test-suite type="Fixture" name="TTestDivisionOperation" executed="True" result="Success" success="True" time="0.633" >
+                            <results>
+                              <test-case name="TestExecute.Standard" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Result Decimal" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Negative" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestDivideByZero" executed="True" result="Success" success="True" time="0.632" asserts="0" />
+                              <test-case name="TestOperationName" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                            </results>
+                          </test-suite>
+                          <test-suite type="Fixture" name="TTestMultiplicationOperation" executed="True" result="Success" success="True" time="0.000" >
+                            <results>
+                              <test-case name="TestExecute.Positive Numbers" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.By Zero" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Negative Numbers" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Positive and Negative" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestOperationName" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                            </results>
+                          </test-suite>
+                          <test-suite type="Fixture" name="TTestSubtractionOperation" executed="True" result="Success" success="True" time="0.000" >
+                            <results>
+                              <test-case name="TestExecute.Standard" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Resulting in Negative" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Negative Numbers" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestExecute.Zeros" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                              <test-case name="TestOperationName" executed="True" result="Success" success="True" time="0.000" asserts="0" />
+                            </results>
+                          </test-suite>
+                      </results>
+                    </test-suite>
+                </results>
+              </test-suite>
+          </results>
+        </test-suite>
+    </results>
+  </test-suite>
+</test-results>

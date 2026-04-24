@@ -1,0 +1,265 @@
+﻿unit View.Calculator;
+
+{
+  Unit   : View.Calculator
+  Desc   : Formulario principal da Calculadora.
+           Responsabilidades da View:
+             - Popular o TComboBox dinamicamente via TOperationFactory.
+             - Delegar o calculo ao TCalculatorEngine (DIP).
+             - Exibir resultado ou mensagem de erro ao usuario.
+           A View nunca conhece as classes concretas de operacao — apenas
+           a interface ICalculatorStrategy (Liskov + DIP).
+  Author : Calc Project
+}
+
+interface
+
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.StdCtrls,
+  // -- Dominio --
+  Calculator.Strategy,
+  Calculator.Factory,
+  Calculator.Engine,
+  Calculator.Operation.Addition,
+  Calculator.Operation.Subtraction,
+  Calculator.Operation.Multiplication,
+  Calculator.Operation.Division;
+
+type
+  TfrmCalculator = class(TForm)
+    { Componentes declarados na ordem do DFM }
+    lblTitle         : TLabel;
+    lblNumberA       : TLabel;
+    edtNumberA       : TEdit;
+    lblOperation     : TLabel;
+    cboOperation     : TComboBox;
+    lblNumberB       : TLabel;
+    edtNumberB       : TEdit;
+    btnCalculate     : TButton;
+    lblResultCaption : TLabel;
+    lblResult        : TLabel;
+    { Handlers de evento — referenciados no DFM }
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnCalculateClick(Sender: TObject);
+  private
+    FFactory    : TOperationFactory;
+    FEngine     : TCalculatorEngine;
+    FOperations : TArray<ICalculatorStrategy>;
+    { Inicializacao }
+    procedure RegisterOperations;
+    procedure PopulateOperationComboBox;
+    procedure ApplyVisualStyle;
+    { Logica de calculo }
+    function TryGetSelectedStrategy(out AStrategy: ICalculatorStrategy): Boolean;
+    function TryParseInputs(out AFirst, ASecond: Double): Boolean;
+    function ParseNumber(const AText: string; out ANumber: Double): Boolean;
+    { Saida }
+    procedure DisplayResult(const AValue: Double);
+    procedure DisplayError(const AMessage: string);
+  end;
+
+var
+  frmCalculator: TfrmCalculator;
+
+implementation
+
+{$R *.dfm}
+
+{ ============================================================ }
+{  Ciclo de vida do formulario                                  }
+{ ============================================================ }
+
+procedure TfrmCalculator.FormCreate(Sender: TObject);
+begin
+  FFactory := TOperationFactory.Create;
+  FEngine  := TCalculatorEngine.Create;
+
+  RegisterOperations;
+  PopulateOperationComboBox;
+  ApplyVisualStyle;
+end;
+
+procedure TfrmCalculator.FormDestroy(Sender: TObject);
+begin
+  FEngine.Free;
+  FFactory.Free;
+end;
+
+{ ============================================================ }
+{  Inicializacao — Operations + ComboBox                        }
+{ ============================================================ }
+
+procedure TfrmCalculator.RegisterOperations;
+begin
+  { Para adicionar nova operacao: criar a classe e registrar aqui.
+    O TComboBox sera populado automaticamente — nenhum texto hardcoded. }
+  FFactory.RegisterOperation(TAdditionOperation.Create);
+  FFactory.RegisterOperation(TSubtractionOperation.Create);
+  FFactory.RegisterOperation(TMultiplicationOperation.Create);
+  FFactory.RegisterOperation(TDivisionOperation.Create);
+end;
+
+procedure TfrmCalculator.PopulateOperationComboBox;
+var
+  LStrategy: ICalculatorStrategy;
+begin
+  FOperations := FFactory.GetOperations;
+  cboOperation.Clear;
+
+  for LStrategy in FOperations do
+    cboOperation.Items.Add(LStrategy.GetOperationName);
+
+  if cboOperation.Items.Count > 0 then
+    cboOperation.ItemIndex := 0;
+end;
+
+{ ============================================================ }
+{  Estilo visual                                                }
+{ ============================================================ }
+
+procedure TfrmCalculator.ApplyVisualStyle;
+const
+  { Paleta de cores — esquema azul-escuro profissional }
+  CLR_HEADER    = $00A04515; { Azul Escuro (BGR) }
+  CLR_FORM_BG   = $00F5F5F5; { Cinza claro quase branco }
+  CLR_LABEL     = $00444444; { Cinza escuro para labels }
+  CLR_INPUT_BG  = $00FFFFFF; { Branco }
+  CLR_RESULT    = $005A3E28; { Marrom escuro (inicial) }
+begin
+  { Formulario }
+  Self.Color := CLR_FORM_BG;
+
+  { Cabecalho colorido }
+  lblTitle.Color       := CLR_HEADER;
+  lblTitle.Transparent := False;
+  lblTitle.Font.Color  := clWhite;
+  lblTitle.Caption     := 'Calculadora';
+
+  { Labels de campo }
+  lblNumberA.Font.Color    := CLR_LABEL;
+  lblNumberA.Caption       := 'Primeiro N' + #250 + 'mero';
+  lblOperation.Font.Color  := CLR_LABEL;
+  lblOperation.Caption     := 'Opera' + #231 + #227 + 'o';
+  lblNumberB.Font.Color    := CLR_LABEL;
+  lblNumberB.Caption       := 'Segundo N' + #250 + 'mero';
+  lblResultCaption.Font.Color := CLR_LABEL;
+  lblResultCaption.Caption    := 'Resultado';
+
+  { Campos de entrada }
+  edtNumberA.Color := CLR_INPUT_BG;
+  edtNumberB.Color := CLR_INPUT_BG;
+
+  { Resultado inicial }
+  lblResult.Caption    := #8212; { Unicode — (em dash) }
+  lblResult.Font.Color := CLR_RESULT;
+end;
+
+{ ============================================================ }
+{  Handler do botao Calcular                                    }
+{ ============================================================ }
+
+procedure TfrmCalculator.btnCalculateClick(Sender: TObject);
+var
+  LStrategy : ICalculatorStrategy;
+  LFirst    : Double;
+  LSecond   : Double;
+  LResult   : Double;
+begin
+  if not TryGetSelectedStrategy(LStrategy) then
+  begin
+    DisplayError('Selecione uma opera' + #231 + #227 + 'o.');
+    Exit;
+  end;
+
+  if not TryParseInputs(LFirst, LSecond) then
+  begin
+    DisplayError('Digite n' + #250 + 'meros v' + #225
+      + 'lidos nos dois campos.');
+    Exit;
+  end;
+
+  try
+    FEngine.SetStrategy(LStrategy);
+    LResult := FEngine.Calculate(LFirst, LSecond);
+    DisplayResult(LResult);
+  except
+    on E: Exception do
+      DisplayError(E.Message);
+  end;
+end;
+
+{ ============================================================ }
+{  Metodos auxiliares privados                                  }
+{ ============================================================ }
+
+function TfrmCalculator.TryGetSelectedStrategy(
+  out AStrategy: ICalculatorStrategy): Boolean;
+var
+  LIndex: Integer;
+begin
+  AStrategy := nil;
+  LIndex    := cboOperation.ItemIndex;
+
+  Result := (LIndex >= 0) and (LIndex < Length(FOperations));
+  if Result then
+    AStrategy := FOperations[LIndex];
+end;
+
+function TfrmCalculator.ParseNumber(const AText: string; out ANumber: Double): Boolean;
+var
+  LSettings: TFormatSettings;
+begin
+  { Tenta com o locale do sistema }
+  if TryStrToFloat(AText, ANumber) then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  { Tenta com o separador alternativo }
+  LSettings                  := TFormatSettings.Create;
+  LSettings.ThousandSeparator := #0;
+
+  if FormatSettings.DecimalSeparator = ',' then
+    LSettings.DecimalSeparator := '.'
+  else
+    LSettings.DecimalSeparator := ',';
+
+  Result := TryStrToFloat(AText, ANumber, LSettings);
+end;
+
+function TfrmCalculator.TryParseInputs(out AFirst, ASecond: Double): Boolean;
+begin
+  AFirst  := 0;
+  ASecond := 0;
+  Result  := ParseNumber(edtNumberA.Text, AFirst)
+         and ParseNumber(edtNumberB.Text, ASecond);
+end;
+
+procedure TfrmCalculator.DisplayResult(const AValue: Double);
+const
+  CLR_OK = $0048A84E; { Verde escuro }
+begin
+  lblResult.Caption    := FloatToStr(AValue);
+  lblResult.Font.Color := CLR_OK;
+  lblResult.Font.Size  := 19;
+end;
+
+procedure TfrmCalculator.DisplayError(const AMessage: string);
+const
+  CLR_ERR = $000000CC; { Vermelho }
+begin
+  lblResult.Caption    := AMessage;
+  lblResult.Font.Color := CLR_ERR;
+  lblResult.Font.Size  := 14;
+end;
+
+end.
